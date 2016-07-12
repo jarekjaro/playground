@@ -1,5 +1,9 @@
 import org.springframework.stereotype.Component;
 
+import javax.jms.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 @Component
 public class PlayerImpl implements Player {
 
@@ -42,53 +46,43 @@ public class PlayerImpl implements Player {
 
     }
 
-//    public static void main(String[] args) {
-//        Connection con = null;
-//        try {
-//            Context ctx = new InitialContext();
-//            ConnectionFactory factory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
-//            String admDestName = args[0];
-//            Destination dest = (Destination) ctx.lookup(admDestName);
-//            con = factory.createConnection();
-//            Session ses = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//            MessageConsumer receiver = ses.createConsumer(dest);
-//            //MESSAGE LISTENER EXAMPLE
-////            receiver.setMessageListener(new MessageListener() {
-////                public void onMessage(Message message) {
-////                    if (message instanceof TextMessage) {
-////                        TextMessage txtMsg = (TextMessage) message;
-////                        try {
-////                            System.out.println("Received: " + txtMsg.getText());
-////                        } catch (JMSException e) {
-////                            e.printStackTrace();
-////                        }
-////                    } else if (message != null) {
-////                        System.out.println("Received non text message");
-////                    }
-////                }
-////            });
-//
-//            con.start();
-//            System.out.println("Receiver started");
-//            Message msg = receiver.receive();
-//            if (msg instanceof TextMessage) {
-//                TextMessage text = (TextMessage) msg;
-//                System.out.println("Received: " + text.getText());
-//            } else if (msg != null) {
-//                System.out.println("Received non text message");
-//            }
-//        } catch (Exception exc) {
-//            exc.printStackTrace();
-//            System.exit(1);
-//        } finally {
-//            if (con != null) {
-//                try {
-//                    con.close();
-//                } catch (JMSException exc) {
-//                    System.err.println(exc);
-//                }
-//            }
-//        }
-//        System.exit(0);
-//    }
+    void establishConnection() {
+        Connection con = null;
+        try {
+            Context ctx = new InitialContext();
+            ConnectionFactory factory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
+            String admDestName = ".";
+            Destination dest = (Destination) ctx.lookup(admDestName);
+            con = factory.createConnection();
+            Session ses = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer receiver = ses.createConsumer(dest);
+            receiver.setMessageListener(message -> {
+                if (message instanceof TextMessage) {
+                    TextMessage txtMsg = (TextMessage) message;
+                    try {
+                        System.out.println("Received: " + txtMsg.getText());
+                    } catch (JMSException e) {
+                        e.printStackTrace();
+                    }
+                } else if (message != null) {
+                    System.out.println("Received non text message");
+                }
+            });
+
+            con.start();
+            System.out.println("Receiver started");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.exit(1);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (JMSException exc) {
+                    System.err.println(exc);
+                }
+            }
+        }
+        System.exit(0);
+    }
 }
