@@ -1,49 +1,30 @@
-import javax.annotation.Resource;
+import org.apache.activemq.ActiveMQConnectionFactory;
+
 import javax.jms.*;
 
 public class SynchPlayerImpl extends Player {
 
-    @Resource(lookup = "jms/ConnectionFactory")
-    private static ConnectionFactory connectionFactory;
+    static ConnectionFactory connectionFactory;
+    static Connection connection;
+    static Session session;
+    static Destination destination;
+    static MessageConsumer messageConsumer;
+    static Message message;
+    static boolean useTransaction = false;
+    static final String brokerURL = "tcp://localhost:61616";
 
-    public static void main(String args[]) {
-        Connection con = null;
-        try {
-            String destType = Helper.determineDestType(args[0]);
-            Destination dest = SquashClub.assignProperDest(destType);
-
-            con = connectionFactory.createConnection();
-            Session ses = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-            MessageConsumer receiver = ses.createConsumer(dest);
-
-            con.start();
-            System.out.println("Receiver started");
-            TextMessage message = null;
-
-            while (true) {
-                Message m = receiver.receive(10);
-                if (m != null) {
-                    if (m instanceof TextMessage) {
-                        message = (TextMessage) m;
-                        System.out.println("Reading message: " + message.getText());
-                    } else {
-                        break;
-                    }
-                }
-            }
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.exit(1);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (JMSException exc) {
-                    System.err.println(exc);
-                }
-            }
+    public static void main(String args[]) throws JMSException {
+        connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+        connection = connectionFactory.createConnection();
+        connection.start();
+        session = connection.createSession(useTransaction, Session.AUTO_ACKNOWLEDGE);
+        destination = session.createQueue("Contests");
+        messageConsumer = session.createConsumer(destination);
+        while (true) {
+            message = messageConsumer.receive(10000);
+            if (message instanceof TextMessage)
+                System.out.println(((TextMessage) message).getText());
+            else break;
         }
-        System.exit(0);
     }
 }
