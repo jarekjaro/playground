@@ -9,7 +9,6 @@ class AsyncQueConsumer {
     static Session session;
     static Destination destination;
     static MessageConsumer messageConsumer;
-    static Message message;
     static boolean useTransaction = false;
     static final String brokerURL = "tcp://localhost:61616";
 
