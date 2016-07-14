@@ -12,6 +12,7 @@ public class QuePublisher {
     static Message message;
     static boolean useTransaction = false;
     static final String brokerURL = "tcp://localhost:61616";
+//    static final String brokerURL = "nio://localhost:61618";
 
     public static void main(String[] args) throws JMSException {
         connectionFactory = new ActiveMQConnectionFactory(brokerURL);
