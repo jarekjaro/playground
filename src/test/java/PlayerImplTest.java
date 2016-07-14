@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 public class PlayerImplTest {
-    private AsyncPlayerImpl player = mock(AsyncPlayerImpl.class);
+    private AsyncQueConsumer player = mock(AsyncQueConsumer.class);
 
     @Test
     public void playerShouldNotBeNull(){
