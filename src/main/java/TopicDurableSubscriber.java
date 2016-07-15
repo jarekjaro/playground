@@ -1,7 +1,9 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 
+@Component
 public class TopicDurableSubscriber {
     static ConnectionFactory connectionFactory;
     static Connection connection;

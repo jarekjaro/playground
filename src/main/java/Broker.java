@@ -2,11 +2,15 @@ import org.apache.activemq.broker.BrokerPlugin;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.security.AuthenticationUser;
 import org.apache.activemq.security.SimpleAuthenticationPlugin;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class Broker {
+    public Broker() {
+    }
     public static void main(String[] args) throws Exception {
         BrokerService broker = new BrokerService();
         broker.setBrokerName("myBroker");

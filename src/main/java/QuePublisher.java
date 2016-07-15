@@ -1,7 +1,9 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 
+@Component
 public class QuePublisher {
 
     static ConnectionFactory connectionFactory;
