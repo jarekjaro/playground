@@ -11,10 +11,12 @@ public class TopicConsumer {
     static MessageConsumer messageConsumer;
     static boolean useTransaction = false;
     static final String brokerURL = "tcp://localhost:61616";
+    static String username = "consumer";
+    static String password = "password";
 
     public static void main(String args[]) throws JMSException {
         connectionFactory = new ActiveMQConnectionFactory(brokerURL);
-        connection = connectionFactory.createConnection();
+        connection = connectionFactory.createConnection(username, password);
         connection.start();
         session = connection.createSession(useTransaction, Session.AUTO_ACKNOWLEDGE);
         destination = session.createTopic("Contests");
