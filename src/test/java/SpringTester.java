@@ -1,26 +1,24 @@
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
+@RunWith(JUnit4.class)
+@ContextConfiguration(classes = PlaygroundConfiguration.class)
 public class SpringTester {
-    AnnotationConfigApplicationContext context;
-    @Before
-    public void before(){
-        context = new AnnotationConfigApplicationContext(PlaygroundConfiguration.class);
-        context.refresh();
-    }
 
-    private AsyncQueConsumer player = mock(AsyncQueConsumer.class);
+    @Autowired
+    private AsyncQueConsumer player;
 
     @Test
-    public void playerShouldNotBeNull(){
+    public void playerShouldNotBeNull() {
         assertNotNull(player);
     }
+
     @Test
-    public void testBrokerCreation(){
+    public void testBrokerCreation() {
     }
 }
