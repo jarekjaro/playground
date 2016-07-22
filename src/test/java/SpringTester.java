@@ -53,7 +53,7 @@ public class SpringTester {
         context = JAXBContext.newInstance(clazz);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        m.marshal(document, System.out);
+        m.marshal(document, new File("tester.xml"));
     }
 
     public <T> T unmarshal(Class<T> docClass, InputStream is) throws JAXBException {
