@@ -1,9 +1,7 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 
-@Component
 public class TopicPublisher {
 
     static ConnectionFactory connectionFactory;
@@ -26,6 +24,5 @@ public class TopicPublisher {
         messageProducer = session.createProducer(destination);
         message = session.createTextMessage();
         Helper.publish(100, message, messageProducer, destination);
-//        messageProducer.send(destination, session.createMessage());
     }
 }

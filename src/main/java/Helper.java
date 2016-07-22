@@ -1,8 +1,5 @@
-import org.springframework.stereotype.Component;
-
 import javax.jms.*;
 
-@Component
 public class Helper {
     static void publish(int noOfMsgs, Message message, MessageProducer msgProducer, Destination destination) {
         for (int i = 0; i < noOfMsgs; i++) {
@@ -11,9 +8,7 @@ public class Helper {
                 TextMessage txtMsg = (TextMessage) message;
                 txtMsg.setText("this is message number " + i);
                 msgProducer.send(destination, txtMsg);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (JMSException e) {
+            } catch (InterruptedException | JMSException e) {
                 e.printStackTrace();
             }
         }

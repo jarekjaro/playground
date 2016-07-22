@@ -1,9 +1,7 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 
-@Component
 class AsyncQueConsumer {
 
     static ConnectionFactory connectionFactory;

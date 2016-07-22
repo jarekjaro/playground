@@ -1,9 +1,7 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 
-@Component
 public class SynchQueConsumer {
 
     static ConnectionFactory connectionFactory;
@@ -16,7 +14,6 @@ public class SynchQueConsumer {
     static final String brokerURL = "tcp://localhost:61616";
     static String username = "consumer";
     static String password = "password";
-//    static final String brokerURL = "nio://localhost:61618";
 
     public static void main(String args[]) throws JMSException {
         connectionFactory = new ActiveMQConnectionFactory(brokerURL);
