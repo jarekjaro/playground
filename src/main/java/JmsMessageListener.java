@@ -28,7 +28,6 @@ public class JmsMessageListener implements MessageListener {
             if (message instanceof TextMessage) {
                 TextMessage tm = (TextMessage) message;
                 String msg = tm.getText();
-                System.out.println("Received Message: " + msg);
 
                 logger.info("Processed message '{}'.  value={}", msg, messageCount);
 

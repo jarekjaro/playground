@@ -15,7 +15,6 @@ public class QuePublisher {
     static final String brokerURL = "tcp://localhost:61616";
     static String username = "publisher";
     static String password = "password";
-//    static final String brokerURL = "nio://localhost:61618";
 
     public static void main(String[] args) throws JMSException {
         connectionFactory = new ActiveMQConnectionFactory(brokerURL);
@@ -26,7 +25,6 @@ public class QuePublisher {
         messageProducer = session.createProducer(destination);
         message = session.createTextMessage();
         Helper.publish(100, message, messageProducer, destination);
-//        messageProducer.send(destination, session.createMessage());
     }
 
 

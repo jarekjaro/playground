@@ -13,7 +13,6 @@ import javax.xml.validation.SchemaFactory;
 import java.io.*;
 
 @RunWith(JUnit4.class)
-//@ContextConfiguration(locations = "JmsMessageListenerTest-context.xml")
 public class SpringTester {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("JmsMessageListenerTest-context.xml");
 

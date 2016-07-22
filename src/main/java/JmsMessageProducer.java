@@ -3,7 +3,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
-import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -29,7 +28,10 @@ public class JmsMessageProducer {
             final String text = "Message number is " + i + ".";
             template.send(new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {
-                    TextMessage message = session.createTextMessage(text);
+                    TextMessage message = new TextMessageBuilder()
+                            .session(session)
+                            .elementToSend(new MarshallingTesterClass())
+                            .build();
                     message.setIntProperty(MESSAGE_COUNT, index);
 
                     logger.info("Sending message: " + text);
