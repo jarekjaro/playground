@@ -26,12 +26,20 @@ public class SpringTester {
     @Test
     public void testJdbcConnection() {
         SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
-        int countOfActorsNamedJoe = springJDBC.getJdbcTemplate().queryForObject(
+        int rows = springJDBC.getJdbcTemplate().queryForObject(
                 "select count(*) from OBJECTS where UUID<>0", Integer.class);
-        System.out.println();
-        System.out.println(countOfActorsNamedJoe);
-        System.out.println();
-        assertEquals(1, countOfActorsNamedJoe);
+        MarshallingTesterClass testerClass = (MarshallingTesterClass) springJDBC
+                .getJdbcTemplate()
+                .queryForObject("select * from Objects where UUID = 'b5994efb-6594-3e21-be67-749d3a7f8d5d'",
+                        new TesterClassRowMapper());
+
+        MarshallingTesterClass testerClass2 = (MarshallingTesterClass) springJDBC
+                .getJdbcTemplate()
+                .queryForObject("select * from Objects where UUID = 'ae9f8f81-a870-436b-bb40-4ec4bcdcb92a'",
+                        new TesterClassRowMapper());
+
+        assertEquals("burek", testerClass.getOrders().get(0).substring(0,5));
+        assertEquals(2, rows);
     }
 
     private String getMessageFromFile(String fileName) {
