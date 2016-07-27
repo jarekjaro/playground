@@ -1,4 +1,3 @@
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -12,6 +11,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(JUnit4.class)
 public class SpringTester {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("JmsMessageListenerTest-context.xml");
@@ -20,6 +21,17 @@ public class SpringTester {
     public void testMarshallingOnSampleClass() throws JMSException {
         JmsMessageProducer messageProducer = (JmsMessageProducer) context.getBean("jmsMessageProducer");
         messageProducer.generateMessages();
+    }
+
+    @Test
+    public void testJdbcConnection() {
+        SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
+        int countOfActorsNamedJoe = springJDBC.getJdbcTemplate().queryForObject(
+                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+        System.out.println();
+        System.out.println(countOfActorsNamedJoe);
+        System.out.println();
+        assertEquals(1, countOfActorsNamedJoe);
     }
 
     private String getMessageFromFile(String fileName) {
