@@ -1,13 +1,13 @@
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @XmlRootElement
 public class MarshallingTesterClass {
-    @XmlElement
     private UUID uuid = UUID.randomUUID();
-    @XmlElementWrapper(name = "orders")
     private List<String> orders = new ArrayList<>();
 
     public MarshallingTesterClass() {
@@ -16,20 +16,22 @@ public class MarshallingTesterClass {
         orders.add("ziomal_3");
     }
 
+    @XmlElementWrapper(name = "orders")
     public List<String> getOrders() {
         return orders;
     }
 
+    public void setOrders(List<String> order) {
+        this.orders = order;
+    }
+
+    @XmlElement
     public UUID getUuid() {
         return uuid;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public void setOrders(List<String> order) {
-        this.orders = order;
     }
 
     @Override

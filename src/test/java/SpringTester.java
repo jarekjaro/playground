@@ -26,20 +26,45 @@ public class SpringTester {
     @Test
     public void testJdbcConnection() {
         SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
-        int rows = springJDBC.getJdbcTemplate().queryForObject(
-                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+
         MarshallingTesterClass testerClass = (MarshallingTesterClass) springJDBC
                 .getJdbcTemplate()
                 .queryForObject("select * from Objects where UUID = 'b5994efb-6594-3e21-be67-749d3a7f8d5d'",
                         new TesterClassRowMapper());
-
+        MarshallingTesterClass testerClass1 = (MarshallingTesterClass) springJDBC
+                .getJdbcTemplate()
+                .queryForObject("select * from Objects where UUID = 'b5994efb-6594-3e21-be67-749d3a7f8d5f'",
+                        new TesterClassRowMapper());
         MarshallingTesterClass testerClass2 = (MarshallingTesterClass) springJDBC
                 .getJdbcTemplate()
                 .queryForObject("select * from Objects where UUID = 'ae9f8f81-a870-436b-bb40-4ec4bcdcb92a'",
                         new TesterClassRowMapper());
 
-        assertEquals("burek", testerClass.getOrders().get(0).substring(0,5));
-        assertEquals(2, rows);
+        assertEquals("burek", testerClass2.getOrders().get(0));
+        assertEquals("furek", testerClass2.getOrders().get(1));
+        assertEquals("szmalek", testerClass2.getOrders().get(2));
+        assertEquals("burek", testerClass1.getOrders().get(0));
+        assertEquals("furek", testerClass1.getOrders().get(1));
+        assertEquals("szmalek", testerClass1.getOrders().get(2));
+        assertEquals("ziomal", testerClass.getOrders().get(0));
+        assertEquals("ziomal_2", testerClass.getOrders().get(1));
+        assertEquals("ziomal_3", testerClass.getOrders().get(2));
+    }
+
+    @Test
+    public void testWritingToDB() {
+        SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
+        int starting_rows = springJDBC.getJdbcTemplate().queryForObject(
+                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+        MarshallingTesterClass testerClass = new MarshallingTesterClass();
+        springJDBC.getJdbcTemplate().execute("INSERT INTO OBJECTS (UUID, ORDERS) VALUES (" +
+                "'" + testerClass.getUuid() + "'" + "," +
+                "(" + "'" + testerClass.getOrders().get(0) + "', " +
+                      "'" + testerClass.getOrders().get(1) + "', " +
+                      "'" + testerClass.getOrders().get(2) + "'))");
+        int ending_rows = springJDBC.getJdbcTemplate().queryForObject(
+                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+        assertEquals(starting_rows + 1, ending_rows);
     }
 
     private String getMessageFromFile(String fileName) {
