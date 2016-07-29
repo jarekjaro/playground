@@ -5,12 +5,15 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:int="http://www.springframework.org/schema/integration"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context.xsd
                            http://www.springframework.org/schema/jms
                            http://www.springframework.org/schema/jms/spring-jms.xsd
+                           http://www.springframework.org/schema/integration
+                           http://www.springframework.org/schema/integration/spring-integration.xsd
                            http://activemq.apache.org/schema/core
                            http://activemq.apache.org/schema/core/activemq-core.xsd">
     <!--  Embedded ActiveMQ Broker -->
@@ -70,6 +73,12 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
     </bean>
-
     <context:property-placeholder location="jdbc.properties"/>
+    <int:publish-subscribe-channel id="subscribeChannel"/>
+    <int:channel id="directChannel"/>
+    <int:transformer id="testTransformer" input-channel="subscribeChannel"
+                     method="transform" output-channel="directChannel">
+        <bean class="TestTransformer"/>
+    </int:transformer>
+
 </beans>
