@@ -2,11 +2,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
-import javax.transaction.TransactionManager;
 import javax.xml.bind.JAXBException;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +29,13 @@ public class SpringTester {
         assertEquals("ziomal", testerClass.getOrders().get(0));
         assertEquals("ziomal_2", testerClass.getOrders().get(1));
         assertEquals("ziomal_3", testerClass.getOrders().get(2));
+    }
+
+    @Test
+    public void testTransactionalDBAccess(){
+        MtcTransactionalService mtcTransService = (MtcTransactionalService) context.getBean("mtcService");
+        MarshallingTesterClass mtc = mtcTransService.getMtc(springJDBC, "f7ed237e-efc2-4c05-97a1-5033e2436478");
+        assertEquals("ziomal", mtc.getOrders().get(0));
     }
 
     @Test

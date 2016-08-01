@@ -6,6 +6,8 @@
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:amq="http://activemq.apache.org/schema/core"
        xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
@@ -15,7 +17,11 @@
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd
                            http://activemq.apache.org/schema/core
-                           http://activemq.apache.org/schema/core/activemq-core.xsd">
+                           http://activemq.apache.org/schema/core/activemq-core.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd">
     <!--  Embedded ActiveMQ Broker -->
     <amq:broker id="broker" useJmx="false" persistent="false">
         <amq:transportConnectors>
@@ -64,6 +70,23 @@
         <constructor-arg ref="jmsProducerTemplate"/>
     </bean>
 
+    <bean id="mtcService" class="DefaultMtcTransServiceImpl"/>
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="mtcServiceMethods" expression="execution(* MtcTransactionalService.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="mtcServiceMethods"/>
+    </aop:config>
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean name="springJDBC" class="SpringJDBC">
         <constructor-arg ref="dataSource"/>
     </bean>
@@ -73,9 +96,7 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
     </bean>
-    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+
     <context:property-placeholder location="jdbc.properties"/>
     <int:publish-subscribe-channel id="subscribeChannel"/>
     <int:channel id="directChannel"/>
