@@ -5,17 +5,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
-import javax.xml.XMLConstants;
-import javax.xml.bind.*;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.*;
+import javax.xml.bind.JAXBException;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class SpringTester {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("JmsMessageListenerTest-context.xml");
+    SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
 
     @Test
     public void testMarshallingOnSampleClass() throws JMSException {
@@ -25,27 +22,10 @@ public class SpringTester {
 
     @Test
     public void testJdbcConnection() {
-        SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
-
         MarshallingTesterClass testerClass = (MarshallingTesterClass) springJDBC
                 .getJdbcTemplate()
-                .queryForObject("select * from Objects where UUID = 'b5994efb-6594-3e21-be67-749d3a7f8d5d'",
+                .queryForObject("select * from Objects where UUID = 'f7ed237e-efc2-4c05-97a1-5033e2436478'",
                         new TesterClassRowMapper());
-        MarshallingTesterClass testerClass1 = (MarshallingTesterClass) springJDBC
-                .getJdbcTemplate()
-                .queryForObject("select * from Objects where UUID = 'b5994efb-6594-3e21-be67-749d3a7f8d5f'",
-                        new TesterClassRowMapper());
-        MarshallingTesterClass testerClass2 = (MarshallingTesterClass) springJDBC
-                .getJdbcTemplate()
-                .queryForObject("select * from Objects where UUID = 'ae9f8f81-a870-436b-bb40-4ec4bcdcb92a'",
-                        new TesterClassRowMapper());
-
-        assertEquals("burek", testerClass2.getOrders().get(0));
-        assertEquals("furek", testerClass2.getOrders().get(1));
-        assertEquals("szmalek", testerClass2.getOrders().get(2));
-        assertEquals("burek", testerClass1.getOrders().get(0));
-        assertEquals("furek", testerClass1.getOrders().get(1));
-        assertEquals("szmalek", testerClass1.getOrders().get(2));
         assertEquals("ziomal", testerClass.getOrders().get(0));
         assertEquals("ziomal_2", testerClass.getOrders().get(1));
         assertEquals("ziomal_3", testerClass.getOrders().get(2));
@@ -53,7 +33,6 @@ public class SpringTester {
 
     @Test
     public void testWritingToDB() {
-        SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
         int starting_rows = springJDBC.getJdbcTemplate().queryForObject(
                 "select count(*) from OBJECTS where UUID<>0", Integer.class);
         MarshallingTesterClass testerClass = new MarshallingTesterClass();
@@ -67,38 +46,13 @@ public class SpringTester {
         assertEquals(starting_rows + 1, ending_rows);
     }
 
-    private String getMessageFromFile(String fileName) {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    void writeXMLClassToTextMessage(Object document, String pathName)
-            throws JAXBException, IOException {
-        Class clazz = document.getClass();
-        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-        Marshaller m = jaxbContext.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        m.marshal(document, new File(pathName));
-    }
-
-    public <T> T unmarshal(Class<T> docClass, InputStream is) throws JAXBException, SAXException {
-        String packageName = docClass.getPackage().getName();
-        JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema mySchema = schemaFactory.newSchema();
-
-        unmarshaller.setSchema(mySchema);
-        JAXBElement<T> doc = (JAXBElement<T>) unmarshaller.unmarshal(is);
-        return doc.getValue();
+    @Test
+    public void testObjectCreationFromXMLStringFromDB() throws JAXBException, SAXException {
+//        springJDBC.getJdbcTemplate().execute("INSERT INTO XML_OBJECT (XML) VALUES ("+
+//        "'"+ new MarshallingTesterClass().toXMLString() +"')");
+        String fromDB = springJDBC.getJdbcTemplate()
+                .queryForObject("SELECT XML FROM XML_OBJECT WHERE ID =1", String.class);
+        MarshallingTesterClass mtc = new MarshallingTesterClass().fromString(fromDB);
+        assertEquals("89f86b3c-0961-4d8a-ac6f-5ff7ac73954c", mtc.getUuid().toString());
     }
 }
