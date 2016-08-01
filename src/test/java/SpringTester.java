@@ -2,9 +2,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
+import javax.transaction.TransactionManager;
 import javax.xml.bind.JAXBException;
 
 import static org.junit.Assert.assertEquals;
