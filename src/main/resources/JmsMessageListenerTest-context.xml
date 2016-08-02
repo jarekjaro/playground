@@ -100,7 +100,7 @@
     <context:property-placeholder location="jdbc.properties"/>
     <int:publish-subscribe-channel id="subscribeChannel"/>
     <int:channel id="directChannel"/>
-    <int:transformer id="testTransformer" input-channel="subscribeChannel"
+    <int:transformer id="testTransformer" input-channel="directChannel"
                      method="transform" output-channel="directChannel">
         <bean class="TestTransformer"/>
     </int:transformer>

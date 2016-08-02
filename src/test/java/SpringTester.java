@@ -1,3 +1,5 @@
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -11,8 +13,15 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class SpringTester {
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("JmsMessageListenerTest-context.xml");
-    SpringJDBC springJDBC = (SpringJDBC) context.getBean("springJDBC");
+    static ClassPathXmlApplicationContext context = null;
+    static SpringJDBC springJDBC = null;
+
+    @BeforeClass
+    public static void init() {
+        context = new ClassPathXmlApplicationContext("JmsMessageListenerTest-context.xml");
+        springJDBC = (SpringJDBC) context.getBean("springJDBC");
+    }
+
 
     @Test
     public void testMarshallingOnSampleClass() throws JMSException {
@@ -24,7 +33,7 @@ public class SpringTester {
     public void testJdbcConnection() {
         MarshallingTesterClass testerClass = (MarshallingTesterClass) springJDBC
                 .getJdbcTemplate()
-                .queryForObject("select * from Objects where UUID = 'f7ed237e-efc2-4c05-97a1-5033e2436478'",
+                .queryForObject("SELECT * FROM Objects WHERE UUID = 'f7ed237e-efc2-4c05-97a1-5033e2436478'",
                         new TesterClassRowMapper());
         assertEquals("ziomal", testerClass.getOrders().get(0));
         assertEquals("ziomal_2", testerClass.getOrders().get(1));
@@ -32,7 +41,7 @@ public class SpringTester {
     }
 
     @Test
-    public void testTransactionalDBAccess(){
+    public void testTransactionalDBAccess() {
         MtcTransactionalService mtcTransService = (MtcTransactionalService) context.getBean("mtcService");
         MarshallingTesterClass mtc = mtcTransService.getMtc(springJDBC, "f7ed237e-efc2-4c05-97a1-5033e2436478");
         assertEquals("ziomal", mtc.getOrders().get(0));
@@ -41,15 +50,15 @@ public class SpringTester {
     @Test
     public void testWritingToDB() {
         int starting_rows = springJDBC.getJdbcTemplate().queryForObject(
-                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+                "SELECT count(*) FROM OBJECTS WHERE UUID<>0", Integer.class);
         MarshallingTesterClass testerClass = new MarshallingTesterClass();
         springJDBC.getJdbcTemplate().execute("INSERT INTO OBJECTS (UUID, ORDERS) VALUES (" +
                 "'" + testerClass.getUuid() + "'" + "," +
                 "(" + "'" + testerClass.getOrders().get(0) + "', " +
-                      "'" + testerClass.getOrders().get(1) + "', " +
-                      "'" + testerClass.getOrders().get(2) + "'))");
+                "'" + testerClass.getOrders().get(1) + "', " +
+                "'" + testerClass.getOrders().get(2) + "'))");
         int ending_rows = springJDBC.getJdbcTemplate().queryForObject(
-                "select count(*) from OBJECTS where UUID<>0", Integer.class);
+                "SELECT count(*) FROM OBJECTS WHERE UUID<>0", Integer.class);
         assertEquals(starting_rows + 1, ending_rows);
     }
 
