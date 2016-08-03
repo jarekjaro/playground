@@ -20,7 +20,7 @@ class AsyncQueConsumer {
         connection.start();
         session = connection.createSession(useTransaction, Session.AUTO_ACKNOWLEDGE);
         destination = session.createQueue("Contests");
-        messageConsumer = session.createConsumer(destination);
+        messageConsumer = session.createConsumer(destination,"id>90");
         messageConsumer.setMessageListener(new Listener());
     }
 }

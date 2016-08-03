@@ -7,6 +7,7 @@ public class Helper {
                 Thread.sleep(20);
                 TextMessage txtMsg = (TextMessage) message;
                 txtMsg.setText("this is message number " + i);
+                txtMsg.setIntProperty("id", i);
                 msgProducer.send(destination, txtMsg);
             } catch (InterruptedException | JMSException e) {
                 e.printStackTrace();
